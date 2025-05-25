@@ -1,6 +1,12 @@
 import csv
 from openai import OpenAI
 
+PROMPT_TEMPLATE = (
+    "Eres un experto en marketing. Genera una descripción atractiva y profesional "
+    "para el siguiente producto: {producto}. Asegúrate de que sea clara, "
+    "convincente y adecuada para e-commerce."
+)
+
 def generar_descripciones(input_csv: str, output_csv: str, api_key: str):
     client = OpenAI(api_key=api_key)
     
@@ -13,13 +19,13 @@ def generar_descripciones(input_csv: str, output_csv: str, api_key: str):
         
         for row in reader:
             product_name = row['producto']
-            prompt = f"Genera una descripción para el producto: {product_name}"
+            user_prompt = PROMPT_TEMPLATE.format(producto=product_name)
             
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "Eres un asistente de marketing."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": user_prompt}
                 ]
             )
             description = response.choices[0].message.content
